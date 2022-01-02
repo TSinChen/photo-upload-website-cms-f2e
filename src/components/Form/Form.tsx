@@ -1,11 +1,12 @@
-import { Box, Button, Card, TextField } from '@mui/material'
 import { useState, FormEvent } from 'react'
+import { Box, Button, Card, TextField, Backdrop, CircularProgress } from '@mui/material'
 import api from '../../apis/apis'
 
 const Form = () => {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [imageLink, setImageLink] = useState('')
+  const [isWaiting, setIsWaiting] = useState(false)
 
   const handleClear = () => {
     setTitle('')
@@ -13,13 +14,17 @@ const Form = () => {
     setImageLink('')
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    setIsWaiting(true)
     try {
       await api.uploadPost({ title, description, imageLink })
       handleClear()
       location.reload()
     } catch (error) {
       console.error(error)
+    } finally {
+      setIsWaiting(false)
     }
   }
 
@@ -59,6 +64,9 @@ const Form = () => {
           </Button>
         </Box>
       </form>
+      <Backdrop open={isWaiting} style={{ zIndex: 99 }}>
+        <CircularProgress />
+      </Backdrop>
     </Card>
   )
 }

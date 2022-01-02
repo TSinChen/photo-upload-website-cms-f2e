@@ -27,6 +27,7 @@ const List = () => {
     id: '',
     title: '',
   })
+  const [isWaiting, setIsWaiting] = useState(false)
 
   const fetchPosts = async () => {
     try {
@@ -47,6 +48,7 @@ const List = () => {
   }
 
   const deletePost = async () => {
+    setIsWaiting(true)
     try {
       await api.deletePost(dialogDeletePost.id)
       setDialogDelete(false)
@@ -54,6 +56,8 @@ const List = () => {
       await fetchPosts()
     } catch (error) {
       console.error(error)
+    } finally {
+      setIsWaiting(false)
     }
   }
 
