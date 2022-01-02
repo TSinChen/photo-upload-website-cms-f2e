@@ -11,6 +11,8 @@ import {
   CardActions,
   Button,
   DialogActions,
+  Backdrop,
+  CircularProgress,
 } from '@mui/material'
 
 import api from '../../apis/apis'
@@ -38,8 +40,12 @@ const List = () => {
     }
   }
 
-  const openDialog = (index: number) => {
+  const openDialogImage = (index: number) => {
     setDialogImage({ open: true, post: posts[index] })
+  }
+
+  const closeDialogImage = () => {
+    setDialogImage({ open: false, post: null })
   }
 
   const checkDelete = (id: Post['_id'], title: Post['title']) => {
@@ -50,6 +56,7 @@ const List = () => {
   const deletePost = async () => {
     setIsWaiting(true)
     try {
+      setDialogDelete(false)
       await api.deletePost(dialogDeletePost.id)
       setDialogDelete(false)
       setDialogDeletePost({ id: '', title: '' })
@@ -78,8 +85,8 @@ const List = () => {
             </Typography>
             <img
               src={post.imageLink}
-              style={{ width: '400px', height: '400px', objectFit: 'contain', cursor: 'pointer' }}
-              onClick={() => openDialog(index)}
+              style={{ width: '400px', height: '400px', objectFit: 'contain', cursor: 'zoom-in' }}
+              onClick={() => openDialogImage(index)}
             />
             <Typography variant="body1" mt={1} textAlign="right">
               {`上傳時間 ${dayjs(post.createdAt).format('YYYY/MM/DD HH:mm')}`}
@@ -92,10 +99,18 @@ const List = () => {
           </CardActions>
         </Card>
       ))}
-      <Dialog open={dialogImage.open} onClose={() => setDialogImage({ open: false, post: null })}>
-        <DialogTitle>{dialogImage.post?.title}</DialogTitle>
+      <Dialog open={dialogImage.open} onClose={closeDialogImage}>
+        <DialogTitle>
+          <Typography variant="h5" my={1}>
+            {dialogImage.post?.title}
+          </Typography>
+        </DialogTitle>
         <DialogContent>
-          <img src={dialogImage.post?.imageLink} style={{ width: '100%', height: '100%' }} />
+          <img
+            src={dialogImage.post?.imageLink}
+            style={{ width: '100%', height: '100%', cursor: 'zoom-out' }}
+            onClick={closeDialogImage}
+          />
         </DialogContent>
       </Dialog>
       <Dialog open={dialogDelete} onClose={() => setDialogDelete(false)}>
@@ -106,6 +121,9 @@ const List = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <Backdrop open={isWaiting} style={{ zIndex: 99 }}>
+        <CircularProgress />
+      </Backdrop>
     </Box>
   )
 }
