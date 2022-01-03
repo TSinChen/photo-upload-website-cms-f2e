@@ -33,10 +33,13 @@ const List = () => {
 
   const fetchPosts = async () => {
     try {
+      setIsWaiting(true)
       const result = await api.getPosts()
       setPosts(result.data.reverse())
     } catch (error) {
       console.error(error)
+    } finally {
+      setIsWaiting(false)
     }
   }
 
